@@ -30,8 +30,8 @@ PixelSamplerPanel::PixelSamplerPanel() :
   sampler_widget_ = new ManagedPixelSamplerWidget(this);
   SetWidgetWithPadding(sampler_widget_);
 
-  connect(this, &PixelSamplerPanel::shown, Core::instance(), []{Core::instance()->RequestPixelSamplingInViewers(true);});
-  connect(this, &PixelSamplerPanel::hidden, Core::instance(), []{Core::instance()->RequestPixelSamplingInViewers(false);});
+  connect(this, &PixelSamplerPanel::isOpenChanged,
+   [](bool isOpen){Core::instance()->RequestPixelSamplingInViewers(isOpen);});
   connect(Core::instance(), &Core::ColorPickerColorEmitted, this, &PixelSamplerPanel::SetValues);
 
   Retranslate();

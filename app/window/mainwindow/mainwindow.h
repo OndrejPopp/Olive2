@@ -23,6 +23,7 @@
 
 #include <kddockwidgets/Config.h>
 #include <kddockwidgets/MainWindow.h>
+#include <kddockwidgets/LayoutSaver.h>
 
 #include "mainwindowlayoutinfo.h"
 #include "node/project.h"
@@ -52,7 +53,7 @@ namespace olive {
 /**
  * @brief Olive's main window responsible for docking widgets and the main menu bar.
  */
-class MainWindow : public KDDockWidgets::MainWindow
+class MainWindow : public KDDockWidgets::QtWidgets::MainWindow
 {
   Q_OBJECT
 public:

@@ -31,7 +31,7 @@ namespace olive {
 /**
  * @brief A widget that is always dockable within the MainWindow.
  */
-class PanelWidget : public KDDockWidgets::DockWidget
+class PanelWidget : public KDDockWidgets::QtWidgets::DockWidget
 {
   Q_OBJECT
 public:

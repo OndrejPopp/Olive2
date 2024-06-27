@@ -284,6 +284,8 @@ int main(int argc, char *argv[])
     a.reset(new QCoreApplication(argc, argv));
   }
 
+  KDDockWidgets::initFrontend(KDDockWidgets::FrontendType::QtWidgets);
+
 #ifdef _WIN32
   // On Windows, users seem to frequently run into a crash caused by their graphics driver not
   // supporting framebuffers, which we require. I personally have only been able to recreate this

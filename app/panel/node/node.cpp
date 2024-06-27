@@ -26,7 +26,8 @@ NodePanel::NodePanel() :
   PanelWidget(QStringLiteral("NodePanel"))
 {
   node_widget_ = new NodeWidget(this);
-  connect(this, &NodePanel::shown, node_widget_->view(), &NodeView::CenterOnItemsBoundingRect);
+  connect(this, &NodePanel::isOpenChanged,
+   [this](bool isOpen) {if (isOpen) node_widget_->view()->CenterOnItemsBoundingRect();});
 
   connect(node_widget_->view(), &NodeView::NodesSelected, this, &NodePanel::NodesSelected);
   connect(node_widget_->view(), &NodeView::NodesDeselected, this, &NodePanel::NodesDeselected);

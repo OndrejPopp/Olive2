@@ -32,7 +32,7 @@
 
 namespace olive {
 
-#define super KDDockWidgets::DockWidget
+#define super KDDockWidgets::QtWidgets::DockWidget
 
 PanelWidget::PanelWidget(const QString &object_name) :
   super(object_name),
@@ -41,7 +41,8 @@ PanelWidget::PanelWidget(const QString &object_name) :
 {
   setFocusPolicy(Qt::ClickFocus);
 
-  connect(this, &PanelWidget::shown, this, static_cast<void(PanelWidget::*)()>(&PanelWidget::setFocus));
+  connect(this, &PanelWidget::isOpenChanged,
+   [this](bool isOpen){if (isOpen) setFocus(Qt::MouseFocusReason);});
 
   PanelManager::instance()->RegisterPanel(this);
 }

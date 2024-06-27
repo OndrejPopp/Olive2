@@ -36,7 +36,7 @@
 
 namespace olive {
 
-#define super KDDockWidgets::MainWindow
+#define super KDDockWidgets::QtWidgets::MainWindow
 
 MainWindow::MainWindow(QWidget *parent) :
   super(QStringLiteral("OliveMain"), KDDockWidgets::MainWindowOption_None, parent),
@@ -92,7 +92,7 @@ MainWindow::MainWindow(QWidget *parent) :
   //       emit the "shown" signal before emitting the "hidden" signals, resulting
   //       in Core thinking there are -1 pixel samplers open. To mitigate that,
   //       we force "shown" to emit ourselves here.
-  emit pixel_sampler_panel_->shown();
+  emit pixel_sampler_panel_->isOpenChanged(true);
 
   // Make node-related connections
   connect(node_panel_, &NodePanel::NodeSelectionChangedWithContexts, param_panel_, &ParamPanel::SetSelectedNodes);
@@ -353,7 +353,7 @@ void MainWindow::ToggleMaximizedPanel()
     premaximized_state_.clear();
 
     currently_focused_panel->raise();
-    currently_focused_panel->setFocus();
+    currently_focused_panel->setFocus(Qt::ActiveWindowFocusReason);
 
     PanelManager::instance()->SetSuppressChangedSignal(false);
   }
@@ -399,7 +399,7 @@ void MainWindow::SetProject(Project *p)
   project_panel_->set_project(p);
 
   if (project_) {
-    project_panel_->setFocus();
+    project_panel_->setFocus(Qt::ActiveWindowFocusReason);
   }
 }
 

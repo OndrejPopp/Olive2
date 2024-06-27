@@ -31,7 +31,9 @@ ParamPanel::ParamPanel() :
   connect(view, &NodeParamView::FocusedNodeChanged, this, &ParamPanel::FocusedNodeChanged);
   connect(view, &NodeParamView::SelectedNodesChanged, this, &ParamPanel::SelectedNodesChanged);
   connect(view, &NodeParamView::RequestViewerToStartEditingText, this, &ParamPanel::RequestViewerToStartEditingText);
-  connect(this, &ParamPanel::shown, view, &NodeParamView::UpdateElementY);
+  connect(this, &ParamPanel::isOpenChanged,
+   [view](bool isOpen) {if (isOpen) view->UpdateElementY();});
+
   SetTimeBasedWidget(view);
 
   Retranslate();
