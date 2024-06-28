@@ -66,7 +66,7 @@ bool AudioProcessor::Open(const AudioParams &from, const AudioParams &to, double
            from.sample_rate(),
            from.sample_rate(),
            from_fmt_,
-           from.channel_layout());
+           from.channel_layout_mask());
 
   int r;
 
@@ -116,14 +116,14 @@ bool AudioProcessor::Open(const AudioParams &from, const AudioParams &to, double
   }
 
   // Create conversion filter
-  if (from.sample_rate() != to.sample_rate() || from.channel_layout() != to.channel_layout() || from.format() != to.format()
+  if (from.sample_rate() != to.sample_rate() || from.channel_layout_mask() != to.channel_layout_mask() || from.format() != to.format()
       || (to.format().is_planar() && create_tempo)) { // Tempo processor automatically converts to packed,
                                                   // so if the desired output is planar, it'll need
                                                   // to be converted
     snprintf(filter_args, 200, "sample_fmts=%s:sample_rates=%d:channel_layouts=0x%" PRIx64,
              av_get_sample_fmt_name(to_fmt_),
              to.sample_rate(),
-             to.channel_layout());
+             to.channel_layout_mask());
 
     AVFilterContext *c;
     r = avfilter_graph_create_filter(&c, avfilter_get_by_name("aformat"), "fmt", filter_args, nullptr, filter_graph_);
@@ -169,8 +169,17 @@ bool AudioProcessor::Open(const AudioParams &from, const AudioParams &to, double
   if (in_frame_) {
     in_frame_->sample_rate = from.sample_rate();
     in_frame_->format = from_fmt_;
-    in_frame_->channel_layout = from.channel_layout();
-    in_frame_->channels = from.channel_count();
+
+    // temporary fix due to a bug in
+    // libavfilter/buffersrc:av_buffersrc_add_frame_flags(..)
+    // see https://trac.ffmpeg.org/ticket/11069
+    // this section will no longer compile for ffmpeg 7.x and can then be removed
+    _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+    in_frame_->channel_layout = from.channel_layout_mask();
+    in_frame_->channels       = from.channel_count();
+    _Pragma("GCC diagnostic pop")
+
+    av_channel_layout_copy(&in_frame_->ch_layout, &from.channel_layout());
     in_frame_->pts = 0;
   } else {
     qCritical() << "Failed to allocate input frame";

@@ -94,7 +94,7 @@ SequenceDialogParameterTab::SequenceDialogParameterTab(Sequence* sequence, QWidg
   preview_format_field_->SetPixelFormat(vp.format());
   preview_autocache_field_->setChecked(sequence->IsVideoAutoCacheEnabled());
   audio_sample_rate_field_->SetSampleRate(ap.sample_rate());
-  audio_channels_field_->SetChannelLayout(ap.channel_layout());
+  audio_channels_field_->SetChannelLayout(ap.channel_layout_mask());
 
   connect(preview_resolution_field_, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
           this, &SequenceDialogParameterTab::UpdatePreviewResolutionLabel);

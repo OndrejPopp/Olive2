@@ -355,8 +355,8 @@ FootageDescription FFmpegDecoder::Probe(const QString &filename, CancelAtom *can
               // Read first frame and retrieve some metadata
               if (instance.GetFrame(pkt, frame) >= 0) {
                 // Check if video is interlaced and what field dominance it has if so
-                if (frame->interlaced_frame) {
-                  if (frame->top_field_first) {
+                if (frame->flags & AV_FRAME_FLAG_INTERLACED) {
+                  if (frame->flags & AV_FRAME_FLAG_TOP_FIELD_FIRST) {
                     interlacing = VideoParams::kInterlacedTopFirst;
                   } else {
                     interlacing = VideoParams::kInterlacedBottomFirst;
@@ -438,11 +438,8 @@ FootageDescription FFmpegDecoder::Probe(const QString &filename, CancelAtom *can
 
         } else if (avstream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
 
-          // Create an audio stream object
-          uint64_t channel_layout = avstream->codecpar->channel_layout;
-          if (!channel_layout) {
-            channel_layout = static_cast<uint64_t>(av_get_default_channel_layout(avstream->codecpar->channels));
-          }
+          // Get the audio stream object reference
+          const AVChannelLayout& channel_layout = avstream->codecpar->ch_layout;
 
           if (avstream->duration == AV_NOPTS_VALUE || duration_guessed_from_bitrate) {
             // Loop through stream until we get the whole duration
@@ -551,22 +548,23 @@ bool FFmpegDecoder::ConformAudioInternal(const QVector<QString> &filenames, cons
   instance_.Seek(0);
 
   // Handle NULL channel layout
-  uint64_t channel_layout = ValidateChannelLayout(instance_.avstream());
-  if (!channel_layout) {
+  const AVChannelLayout& channel_layout = ValidateChannelLayout(instance_.avstream());
+  if (!channel_layout.nb_channels) {
     qCritical() << "Failed to determine channel layout of audio file, could not conform";
     return false;
   }
 
   // Create resampling context
-  SwrContext* resampler = swr_alloc_set_opts(nullptr,
-                                             params.channel_layout(),
-                                             FFmpegUtils::GetFFmpegSampleFormat(params.format()),
-                                             params.sample_rate(),
-                                             channel_layout,
-                                             static_cast<AVSampleFormat>(instance_.avstream()->codecpar->format),
-                                             instance_.avstream()->codecpar->sample_rate,
-                                             0,
-                                             nullptr);
+  SwrContext* resampler = NULL;
+  swr_alloc_set_opts2(&resampler,
+                      &params.channel_layout(),
+                      FFmpegUtils::GetFFmpegSampleFormat(params.format()),
+                      params.sample_rate(),
+                      &channel_layout,
+                      static_cast<AVSampleFormat>(instance_.avstream()->codecpar->format),
+                      instance_.avstream()->codecpar->sample_rate,
+                      0,
+                      nullptr);
 
   swr_init(resampler);
 
@@ -689,13 +687,16 @@ int FFmpegDecoder::GetNativeChannelCount(AVPixelFormat pix_fmt)
   }
 }
 
-uint64_t FFmpegDecoder::ValidateChannelLayout(AVStream* stream)
+AVChannelLayout FFmpegDecoder::ValidateChannelLayout(AVStream* stream)
 {
-  if (stream->codecpar->channel_layout) {
-    return stream->codecpar->channel_layout;
+  auto& c = stream->codecpar->ch_layout;
+  if (c.nb_channels) {
+    AVChannelLayout l;
+    av_channel_layout_copy(&l, &c);
+    return l;
   }
 
-  return av_get_default_channel_layout(stream->codecpar->channels);
+  return {AV_CHANNEL_ORDER_NATIVE, 0, {0}, nullptr};
 }
 
 const char *FFmpegDecoder::GetInterlacingModeInFFmpeg(VideoParams::Interlacing interlacing)
