@@ -1083,7 +1083,7 @@ QString Core::GetProjectFilter(bool include_any_filter)
     {tr("Olive Project"), QStringLiteral("ove")},
 
     // Uncompressed XML Olive project
-    {tr("Olive Project (Uncompressed XML)"), QStringLiteral("ovexml")},
+    {tr("Olive Project [Uncompressed XML]"), QStringLiteral("ovexml")},
 
     // OpenTimelineIO project, if available
 #ifdef USE_OTIO

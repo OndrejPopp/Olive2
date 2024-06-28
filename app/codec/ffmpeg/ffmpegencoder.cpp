@@ -605,7 +605,7 @@ bool FFmpegEncoder::InitializeStream(AVMediaType type, AVStream** stream_ptr, AV
   // Find encoder
   const AVCodec* encoder = GetEncoder(codec, params().audio_params().format());
   if (!encoder) {
-    SetError(tr("Failed to find codec for 0x%1").arg(codec, 16));
+    SetError(tr("Failed to find encoder for codec %1 0x%2").arg(ExportCodec::GetCodecName(codec)).arg(codec, 0, 16));
     return false;
   }
 
@@ -884,10 +884,16 @@ bool FFmpegEncoder::InitializeResampleContext(const AudioParams &audio)
 const AVCodec *FFmpegEncoder::GetEncoder(ExportCodec::Codec c, SampleFormat aformat)
 {
   switch (c) {
-  case ExportCodec::kCodecH264:
-    return avcodec_find_encoder_by_name("libx264");
-  case ExportCodec::kCodecH264rgb:
-    return avcodec_find_encoder_by_name("libx264rgb");
+  case ExportCodec::kCodecH264: {
+    const AVCodec* e = avcodec_find_encoder_by_name("libx264");
+    if (!e) e = avcodec_find_encoder_by_name("libopenh264");
+
+    return e ? e : avcodec_find_encoder(AV_CODEC_ID_H264);
+  }
+  case ExportCodec::kCodecH264rgb: {
+    const AVCodec* e = avcodec_find_encoder_by_name("libx264rgb");
+    return e ? e : GetEncoder(ExportCodec::kCodecH264, aformat);
+  }
   case ExportCodec::kCodecDNxHD:
     return avcodec_find_encoder(AV_CODEC_ID_DNXHD);
   case ExportCodec::kCodecProRes:
