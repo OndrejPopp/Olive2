@@ -323,7 +323,7 @@ void TimeBasedWidget::ConnectTimelineView(TimeBasedView *base)
   connect(base->horizontalScrollBar(), &QScrollBar::valueChanged, scrollbar(), &QScrollBar::setValue);
 
   // Connect scrollbar to other scrollbars
-  for (TimeBasedView *other : qAsConst(timeline_views_)) {
+  for (TimeBasedView *other : std::as_const(timeline_views_)) {
     connect(other->horizontalScrollBar(), &QScrollBar::valueChanged, base->horizontalScrollBar(), &QScrollBar::setValue);
     connect(base->horizontalScrollBar(), &QScrollBar::valueChanged, other->horizontalScrollBar(), &QScrollBar::setValue);
   }

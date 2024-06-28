@@ -320,7 +320,7 @@ void CurveView::DrawKeyframe(QPainter *painter, NodeKeyframe *key, KeyframeViewI
 bool CurveView::FirstChanceMousePress(QMouseEvent *event)
 {
   dragging_bezier_pt_ = nullptr;
-  QPointF scene_pt = mapToScene(event->pos());
+  QPointF scene_pt = mapToScene(event->position().toPoint());
   foreach (const BezierPoint &b, bezier_pts_) {
     if (b.rect.contains(scene_pt)) {
       dragging_bezier_pt_ = &b;
@@ -333,7 +333,7 @@ bool CurveView::FirstChanceMousePress(QMouseEvent *event)
     dragging_bezier_point_start_ = (dragging_bezier_pt_->type == NodeKeyframe::kInHandle) ? key->bezier_control_in() : key->bezier_control_out();
     dragging_bezier_point_opposing_start_ = (dragging_bezier_pt_->type == NodeKeyframe::kInHandle) ? key->bezier_control_out() : key->bezier_control_in();
 
-    drag_start_ = mapToScene(event->pos());
+    drag_start_ = mapToScene(event->position().toPoint());
     return true;
   } else {
     return false;
@@ -343,7 +343,7 @@ bool CurveView::FirstChanceMousePress(QMouseEvent *event)
 void CurveView::FirstChanceMouseMove(QMouseEvent *event)
 {
   // Calculate cursor difference and scale it
-  QPointF scene_pos = mapToScene(event->pos());
+  QPointF scene_pos = mapToScene(event->position().toPoint());
   QPointF mouse_diff_scaled = GetScaledCursorPos(scene_pos - drag_start_);
 
   if (event->modifiers() & Qt::ShiftModifier) {
@@ -412,7 +412,7 @@ void CurveView::KeyframeDragStart(QMouseEvent *event)
     drag_keyframe_values_[i] = key->value();
   }
 
-  drag_start_ = mapToScene(event->pos());
+  drag_start_ = mapToScene(event->position().toPoint());
 }
 
 void CurveView::KeyframeDragMove(QMouseEvent *event, QString &tip)
@@ -427,7 +427,7 @@ void CurveView::KeyframeDragMove(QMouseEvent *event, QString &tip)
   }
 
   // Calculate cursor difference
-  double scaled_diff = (mapToScene(event->pos()).y() - drag_start_.y()) / GetYScale();
+  double scaled_diff = (mapToScene(event->position().toPoint()).y() - drag_start_.y()) / GetYScale();
 
   // Validate movement - ensure no keyframe goes above its max point or below its min point
   for (size_t i=0; i<GetSelectedKeyframes().size(); i++) {

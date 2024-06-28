@@ -61,6 +61,7 @@ PixelFormat OIIOUtils::GetFormatFromOIIOBasetype(OIIO::TypeDesc::BASETYPE type)
   case OIIO::TypeDesc::INT64:
   case OIIO::TypeDesc::UINT64:
   case OIIO::TypeDesc::STRING:
+  case OIIO::TypeDesc::USTRINGHASH:
   case OIIO::TypeDesc::PTR:
   case OIIO::TypeDesc::LASTBASE:
   case OIIO::TypeDesc::DOUBLE:

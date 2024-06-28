@@ -57,7 +57,7 @@ void ColorSwatchWidget::mousePressEvent(QMouseEvent *e)
 {
   QWidget::mousePressEvent(e);
 
-  SetSelectedColorInternal(GetColorFromScreenPos(e->pos()), false);
+  SetSelectedColorInternal(GetColorFromScreenPos(e->position().toPoint()), false);
   emit SelectedColorChanged(GetSelectedColor());
 }
 
@@ -66,7 +66,7 @@ void ColorSwatchWidget::mouseMoveEvent(QMouseEvent *e)
   QWidget::mouseMoveEvent(e);
 
   if (e->buttons() & Qt::LeftButton) {
-    SetSelectedColorInternal(GetColorFromScreenPos(e->pos()), false);
+    SetSelectedColorInternal(GetColorFromScreenPos(e->position().toPoint()), false);
     emit SelectedColorChanged(GetSelectedColor());
   }
 }

@@ -646,10 +646,10 @@ void ViewerWidget::DetectMulticamNode(const rational &time)
   if (multicam_panel_ && multicam_panel_->isVisible()) {
     if (Sequence *s = dynamic_cast<Sequence*>(GetConnectedNode())) {
       // Prefer selected nodes
-      for (Node *n : qAsConst(node_view_selected_)) {
+      for (Node *n : std::as_const(node_view_selected_)) {
         if ((multicam = dynamic_cast<MultiCamNode*>(n))) {
           // Found multicam, now try to find corresponding clip from selected timeline blocks
-          for (Block *b : qAsConst(timeline_selected_blocks_)) {
+          for (Block *b : std::as_const(timeline_selected_blocks_)) {
             if (ClipBlock *c = dynamic_cast<ClipBlock*>(b)) {
               if (c->range().Contains(time) && c->ContextContainsNode(multicam)) {
                 clip = c;
@@ -663,7 +663,7 @@ void ViewerWidget::DetectMulticamNode(const rational &time)
 
       // Next, prefer multicam from selected block
       if (!multicam) {
-        for (Block *b : qAsConst(timeline_selected_blocks_)) {
+        for (Block *b : std::as_const(timeline_selected_blocks_)) {
           if (b->range().Contains(time)) {
             if ((clip = dynamic_cast<ClipBlock*>(b))) {
               if ((multicam = clip->FindMulticam())) {
@@ -1159,7 +1159,7 @@ RenderTicketPtr ViewerWidget::GetFrame(const rational &t)
     // Frame has been cached, grab the frame
     RenderTicketPtr ticket = std::make_shared<RenderTicket>();
     ticket->setProperty("time", QVariant::fromValue(t));
-    QtConcurrent::run(static_cast<void(*)(RenderTicketPtr, const QString &, const QUuid &, const int64_t &)>(ViewerWidget::DecodeCachedImage), ticket, GetConnectedNode()->video_frame_cache()->GetCacheDirectory(), GetConnectedNode()->video_frame_cache()->GetUuid(), Timecode::time_to_timestamp(t, timebase(), Timecode::kFloor));
+    (void) QtConcurrent::run(static_cast<void(*)(RenderTicketPtr, const QString &, const QUuid &, const int64_t &)>(ViewerWidget::DecodeCachedImage), ticket, GetConnectedNode()->video_frame_cache()->GetCacheDirectory(), GetConnectedNode()->video_frame_cache()->GetUuid(), Timecode::time_to_timestamp(t, timebase(), Timecode::kFloor));
     return ticket;
   }
 }

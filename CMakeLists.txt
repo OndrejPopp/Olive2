@@ -18,7 +18,6 @@ cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 project(olive-editor VERSION 0.2.0 LANGUAGES CXX)
 
-option(BUILD_QT6 "Build with Qt 6 over 5 (experimental)" OFF)
 option(BUILD_DOXYGEN "Build Doxygen documentation" OFF)
 option(BUILD_TESTS "Build unit tests" OFF)
 option(USE_WERROR "Error on compile warning" OFF)
@@ -115,11 +114,8 @@ set(QT_LIBRARIES
 if (UNIX AND NOT APPLE)
   list(APPEND QT_LIBRARIES DBus)
 endif()
-if (BUILD_QT6)
-  set(QT_NAME Qt6)
-else()
-  set(QT_NAME Qt5)
-endif()
+
+set(QT_NAME Qt6)
 find_package(QT
   NAMES
     ${QT_NAME}

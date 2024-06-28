@@ -1497,7 +1497,7 @@ void TimelineWidget::CacheClipsInOut()
   tto.SetTimeTarget(this->sequence());
 
   const TimeRange &r = this->sequence()->GetWorkArea()->range();
-  for (Block *b : qAsConst(selected_blocks_)) {
+  for (Block *b : std::as_const(selected_blocks_)) {
     if (ClipBlock *clip = dynamic_cast<ClipBlock*>(b)) {
       if (Node *connected = clip->GetConnectedOutput(clip->kBufferIn)) {
         TimeRange adjusted = tto.GetAdjustedTime(this->sequence(), connected, r, Node::kTransformTowardsInput);
@@ -1526,7 +1526,7 @@ void TimelineWidget::MulticamEnabledTriggered(bool e)
 {
   MultiUndoCommand *command = new MultiUndoCommand();
 
-  for (Block *b : qAsConst(selected_blocks_)) {
+  for (Block *b : std::as_const(selected_blocks_)) {
     if (ClipBlock *c = dynamic_cast<ClipBlock*>(b)) {
       if (Sequence *s = dynamic_cast<Sequence*>(c->connected_viewer())) {
         if (e) {
@@ -2003,7 +2003,7 @@ QHash<Node *, Node *> TimelineWidget::GenerateExistingPasteMap(const ProjectSeri
   QHash<Node *, Node *> m;
 
   for (Node *n : r.GetLoadData().nodes) {
-    for (Block *b : qAsConst(this->selected_blocks_)) {
+    for (Block *b : std::as_const(this->selected_blocks_)) {
       for (auto it=b->GetContextPositions().cbegin(); it!=b->GetContextPositions().cend(); it++) {
         if (it.key()->id() == n->id() && !m.contains(it.key())) {
           m.insert(it.key(), n);
